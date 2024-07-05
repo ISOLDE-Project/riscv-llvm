@@ -52,6 +52,8 @@ enum {
   InstFormatCSB = 20,
   InstFormatCSH = 21,
   InstFormatOther = 22,
+  InstFormat64bit = 23,
+  InstFormat160bit = 24,
 
   InstFormatMask = 31,
   InstFormatShift = 0,
