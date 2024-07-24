@@ -71,31 +71,98 @@ public:
 
   /// TableGen'erated function for getting the binary encoding for an
   /// instruction.
+
   uint64_t getBinaryCodeForInstr(const MCInst &MI,
                                  SmallVectorImpl<MCFixup> &Fixups,
-                                 const MCSubtargetInfo &STI) const;
+                                 const MCSubtargetInfo &STI) const{
+                                      APInt Inst;
+    APInt Scratch;
+    getBinaryCodeForInstr( MI,
+      Fixups,
+      Inst,
+      Scratch,
+      STI);   
+}
+
+void getBinaryCodeForInstr(const MCInst &MI,
+    SmallVectorImpl<MCFixup> &Fixups,
+    APInt &Inst,
+    APInt &Scratch,
+    const MCSubtargetInfo &STI) const;
 
   /// Return binary encoding of operand. If the machine operand requires
   /// relocation, record the relocation and return zero.
+
+  void getMachineOpValue( 
+                          const MCInst &MI
+                        , const MCOperand &MO
+                        , APInt &op
+                        , SmallVectorImpl<MCFixup> &Fixups
+                        , const MCSubtargetInfo &STI) const{
+
+ op= getMachineOpValue(MI, MO,
+                           Fixups,
+                           STI);
+
+                        }
+
   unsigned getMachineOpValue(const MCInst &MI, const MCOperand &MO,
                              SmallVectorImpl<MCFixup> &Fixups,
                              const MCSubtargetInfo &STI) const;
+
+  void getImmOpValueAsr1(const MCInst &MI, unsigned OpNo, APInt& op,
+                         SmallVectorImpl<MCFixup> &Fixups,
+                         const MCSubtargetInfo &STI) const{
+                          op= getImmOpValueAsr1(MI,OpNo,Fixups,STI);
+
+                         };                           
 
   unsigned getImmOpValueAsr1(const MCInst &MI, unsigned OpNo,
                              SmallVectorImpl<MCFixup> &Fixups,
                              const MCSubtargetInfo &STI) const;
 
+  void getImmOpValue(const MCInst &MI, unsigned OpNo, APInt& op,
+                         SmallVectorImpl<MCFixup> &Fixups,
+                         const MCSubtargetInfo &STI) const{
+                          op= getImmOpValue(MI,OpNo,Fixups,STI);
+
+                         };
+
   unsigned getImmOpValue(const MCInst &MI, unsigned OpNo,
                          SmallVectorImpl<MCFixup> &Fixups,
                          const MCSubtargetInfo &STI) const;
+
+  void getVMaskReg(const MCInst &MI, unsigned OpNo,
+                        APInt& op,
+                       SmallVectorImpl<MCFixup> &Fixups,
+                       const MCSubtargetInfo &STI) const{
+
+                        op = getVMaskReg(MI,OpNo,Fixups,STI);
+                       }                       
 
   unsigned getVMaskReg(const MCInst &MI, unsigned OpNo,
                        SmallVectorImpl<MCFixup> &Fixups,
                        const MCSubtargetInfo &STI) const;
 
+  void getRlistOpValue(const MCInst &MI, unsigned OpNo,
+                        APInt& op,
+                       SmallVectorImpl<MCFixup> &Fixups,
+                       const MCSubtargetInfo &STI) const{
+
+                        op = getRlistOpValue(MI,OpNo,Fixups,STI);
+                       }                       
+
   unsigned getRlistOpValue(const MCInst &MI, unsigned OpNo,
                            SmallVectorImpl<MCFixup> &Fixups,
                            const MCSubtargetInfo &STI) const;
+
+  void getRegReg(const MCInst &MI, unsigned OpNo,
+                        APInt& op,
+                       SmallVectorImpl<MCFixup> &Fixups,
+                       const MCSubtargetInfo &STI) const{
+
+                        op = getRegReg(MI,OpNo,Fixups,STI);
+                       }                           
 
   unsigned getRegReg(const MCInst &MI, unsigned OpNo,
                      SmallVectorImpl<MCFixup> &Fixups,

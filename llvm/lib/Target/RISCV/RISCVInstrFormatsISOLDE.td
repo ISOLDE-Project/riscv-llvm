@@ -20,9 +20,16 @@ class ContiRVFunct7<string name, bits<7> val> {
   bits<7> Value = val;
 }
 
-def CONTIRV_LOAD      : ContiRVFunct7<"LOAD",      0b0000011>;
+class ISOLDERVOps <string name,bits<7> _opcode , bits<7> _funct7> {
+  string Name = name;
+  bits<7> funct7 = _funct7;
+  bits<7> opcode = _opcode;
+}
 
-class ContiRVInst160<dag outs, dag ins, string opcodestr, string argstr, bits<7> _funct7,
+def CONTIRV_LOAD      : ContiRVFunct7<"LOAD",      0b0000011>;
+def ISOLDERV_LOAD     : ISOLDERVOps<"LDQword",         OPC_160BIT.Value,    0b0000011>;
+
+class ISOLDERVInst160<dag outs, dag ins, string opcodestr, string argstr, bits<7> _funct7,
                list<dag> pattern>
     : Instruction {
   field bits<160> Inst;

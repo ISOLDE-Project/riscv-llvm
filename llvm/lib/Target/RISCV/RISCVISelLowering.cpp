@@ -10391,8 +10391,26 @@ RISCVTargetLowering::lowerFixedLengthVectorStoreToRVV(SDValue Op,
 
   MVT ContainerVT = getContainerForFixedLengthVector(VT);
 
-  SDValue NewValue =
-      convertToScalableVector(ContainerVT, StoreVal, DAG, Subtarget);
+  //SDValue NewValue =
+      //convertToScalableVector(ContainerVT, StoreVal, DAG, Subtarget);
+
+  bool IsQuadWord =  (MVT::v4i32== ContainerVT.SimpleTy);
+  unsigned int VectorLen = VT.getVectorNumElements();
+
+  LLVM_DEBUG({
+    if(IsQuadWord){
+      Store->dump();
+      llvm::errs()<<"Value\n";
+      StoreVal.dump();
+      llvm::errs()<<"BasePtr\n";
+      Store->getBasePtr()->dump();
+      llvm::errs()<<"Offset\n";
+      Store->getOffset()->dump();
+    }
+
+  };);
+  SDValue NewValue = IsQuadWord  ? StoreVal :
+      convertToScalableVector(ContainerVT, StoreVal, DAG, Subtarget);    
 
 
   // If we know the exact VLEN and our fixed length vector completely fills

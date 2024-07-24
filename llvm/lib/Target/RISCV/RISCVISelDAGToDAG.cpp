@@ -16,6 +16,7 @@
 #include "MCTargetDesc/RISCVMatInt.h"
 #include "RISCVISelLowering.h"
 #include "RISCVMachineFunctionInfo.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
 #include "llvm/IR/IntrinsicsRISCV.h"
 #include "llvm/Support/Alignment.h"
@@ -876,6 +877,26 @@ void RISCVDAGToDAGISel::selectSF_VC_X_SE(SDNode *Node) {
 }
 
 void RISCVDAGToDAGISel::Select(SDNode *Node) {
+  SDLoc DL(Node);
+  auto EltVT = Node->getValueType(0).getVectorElementType();
+  llvm::SmallVector<SDValue> Ops;
+    for(unsigned int I=0;I<Node->getNumOperands();++I){
+        if(I<4){
+          uint64_t Const1 =0;
+          if(isa<ConstantSDNode>(Node->getOperand(I))){
+           Const1 = Node->getConstantOperandVal(I);
+          }
+           SDValue  Imm1= CurDAG->getTargetConstant(Const1, DL, EltVT);
+           Ops.push_back(Imm1);
+        }else {
+          break;
+        }
+    }
+    while(Ops.size()<4){
+        SDValue  imm1= CurDAG->getTargetConstant(0, DL, EltVT);
+        Ops.push_back(imm1);
+    }
+    auto* LdQ= CurDAG->getMachineNode(RISCV::LDQword,DL,MVT::v4i32,Ops);
   // If we have a custom node, we have already selected.
   if (Node->isMachineOpcode()) {
     LLVM_DEBUG(dbgs() << "== "; Node->dump(CurDAG); dbgs() << "\n");
@@ -887,7 +908,6 @@ void RISCVDAGToDAGISel::Select(SDNode *Node) {
   // should be handled here.
   unsigned Opcode = Node->getOpcode();
   MVT XLenVT = Subtarget->getXLenVT();
-  SDLoc DL(Node);
   MVT VT = Node->getSimpleValueType(0);
 
   bool HasBitTest = Subtarget->hasStdExtZbs() || Subtarget->hasVendorXTHeadBs();

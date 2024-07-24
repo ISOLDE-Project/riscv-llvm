@@ -2007,3 +2007,4 @@ include "RISCVInstrInfoXCV.td"
 //===----------------------------------------------------------------------===//
 
 include "RISCVInstrGISel.td"
+include "RISCVInstrInfoISOLDE.td"

@@ -1,5 +1,5 @@
 
-;build/bin/llc  -mtriple=riscv32 -mattr=+v -target-abi=ilp32d -filetype=asm -o - llvm/test/CodeGen/Conti/test_q.ll 
+;build/bin/llc  -mtriple=riscv32 -mattr=+v -target-abi=ilp32d -filetype=asm -o - llvm/test/CodeGen/ISOLDE/test_q.ll 
 declare   <4 x i32>  @foo( <4 x i32>  )  
 
 define <4 x i32> @test(){
