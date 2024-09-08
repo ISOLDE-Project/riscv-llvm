@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-//===------ llvm/lib/Target/RISCV/RISCVInstrInfoConti.td---------------------------===//
+//===------ llvm/lib/Target/RISCV/RISCVInstrInfoISOLDE.td---------------------------===//
 //
 // Copyright 2023
 //
@@ -15,7 +15,7 @@
 def OPC_64BIT     : RISCVOpcode<"64BIT",     0b0111111>;
 def OPC_160BIT    : RISCVOpcode<"160BIT",    0b1111111>;
 
-class ContiRVFunct7<string name, bits<7> val> {
+class ISOLDERVFunct7<string name, bits<7> val> {
   string Name = name;
   bits<7> Value = val;
 }
@@ -26,7 +26,6 @@ class ISOLDERVOps <string name,bits<7> _opcode , bits<7> _funct7> {
   bits<7> opcode = _opcode;
 }
 
-def CONTIRV_LOAD      : ContiRVFunct7<"LOAD",      0b0000011>;
 def ISOLDERV_LOAD     : ISOLDERVOps<"LDQword",         OPC_160BIT.Value,    0b0000011>;
 
 class ISOLDERVInst160<dag outs, dag ins, string opcodestr, string argstr, bits<7> _funct7,
