@@ -81,7 +81,8 @@ public:
       Fixups,
       Inst,
       Scratch,
-      STI);   
+      STI);
+      return Inst.getRawData()[0];  
 }
 
 void getBinaryCodeForInstr(const MCInst &MI,
