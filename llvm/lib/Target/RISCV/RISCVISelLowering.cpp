@@ -10,7 +10,6 @@
 // selection DAG.
 //
 //===----------------------------------------------------------------------===//
-
 #include "RISCVISelLowering.h"
 #include "MCTargetDesc/RISCVMatInt.h"
 #include "RISCV.h"
@@ -43,6 +42,8 @@
 #include "llvm/Support/KnownBits.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/IR/Intrinsics.h"
+
 #include <optional>
 
 using namespace llvm;
@@ -1564,7 +1565,12 @@ bool RISCVTargetLowering::getTgtMemIntrinsic(IntrinsicInfo &Info,
     return SetRVVLoadStoreInfo(/*PtrOp*/ I.arg_size() - 2,
                                /*IsStore*/ true,
                                /*IsUnitStrided*/ false, /*UsePtrVal*/ true);
-  case Intrinsic::riscv_vle:
+  case Intrinsic::ISOLDE_vse:
+  case Intrinsic::ISOLDE_vle:
+  case Intrinsic::ISOLDE_onnx_gemmf32:
+  case Intrinsic::ISOLDE_onnx_gemmi32:
+  case Intrinsic::ISOLDE_onnx_gemmi16:
+  case Intrinsic::ISOLDE_onnx_gemmi8:
   case Intrinsic::riscv_vle_mask:
   case Intrinsic::riscv_vleff:
   case Intrinsic::riscv_vleff_mask:

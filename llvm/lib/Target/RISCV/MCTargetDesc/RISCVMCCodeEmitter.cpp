@@ -401,6 +401,11 @@ void RISCVMCCodeEmitter::encodeInstruction(const MCInst &MI,
     return;
   }
 
+  if (Size != 2 && Size != 4) {
+    llvm::errs() << "Warning: Unexpected instruction size " << Size << ". Defaulting to 4.\n";
+    Size = 4;
+  }
+
   switch (Size) {
   default:
     llvm_unreachable("Unhandled encodeInstruction length!");

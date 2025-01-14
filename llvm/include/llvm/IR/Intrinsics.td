@@ -400,6 +400,9 @@ class LLVMQualPointerType<int addrspace>
     ]);
 }
 
+class LLVMPointerType<LLVMType elty , int addrspace = 0>
+    : LLVMQualPointerType<addrspace>;
+
 class LLVMAnyPointerType : LLVMAnyType<iPTRAny> {
   assert isAny, "iPTRAny should have isOverloaded";
 }
@@ -2647,5 +2650,6 @@ include "llvm/IR/IntrinsicsSPIRV.td"
 include "llvm/IR/IntrinsicsVE.td"
 include "llvm/IR/IntrinsicsDirectX.td"
 include "llvm/IR/IntrinsicsLoongArch.td"
+include "llvm/IR/IntrinsicsISOLDE.td"
 
 #endif // TEST_INTRINSICS_SUPPRESS_DEFS

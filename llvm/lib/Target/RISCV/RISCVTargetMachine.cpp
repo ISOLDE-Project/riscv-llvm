@@ -9,7 +9,6 @@
 // Implements the info about RISC-V target spec.
 //
 //===----------------------------------------------------------------------===//
-
 #include "RISCVTargetMachine.h"
 #include "MCTargetDesc/RISCVBaseInfo.h"
 #include "RISCV.h"

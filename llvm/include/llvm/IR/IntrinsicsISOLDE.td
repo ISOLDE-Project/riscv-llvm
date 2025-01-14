@@ -12,6 +12,7 @@
 // 2.  make intrinsics_gen -j6
 // 3.  make llc -j30
 //===----------------------------------------------------------------------===//
+//include "llvm/IR/Intrinsics.td"
 
 class ISOLDEVIntrinsic {
   // These intrinsics may accept illegal integer values in their llvm_any_ty
@@ -157,7 +158,7 @@ class ONNXGEMM<ValueType op_type> : Intrinsic<
                                    ],
 /*** param types*/                 [ 
 /*  ptr %output         */         LLVMPointerType< LLVMType< op_type > >
-/*  ptr %input_A        */       , LLVMPointerType< LLVMType< op_type > >
+/*  ptr %input_A          */       , LLVMPointerType< LLVMType< op_type > >
 /*  <4 x i32> %shape_A  */       , llvm_v4i32_ty
 /*  ptr %input_B        */       , LLVMPointerType< LLVMType< op_type > > 
 /*  <4 x i32> %shape_B  */       , llvm_v4i32_ty
