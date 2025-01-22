@@ -71,9 +71,20 @@ public:
 
   /// TableGen'erated function for getting the binary encoding for an
   /// instruction.
+  void getBinaryCodeForInstr(const MCInst &MI, SmallVectorImpl<MCFixup> &Fixups,
+                             APInt &Inst, APInt &Scratch,
+                             const MCSubtargetInfo &STI) const;
+  // the old function shall be a wrapper of the one above (simplifies codes
+  // updates)
   uint64_t getBinaryCodeForInstr(const MCInst &MI,
                                  SmallVectorImpl<MCFixup> &Fixups,
-                                 const MCSubtargetInfo &STI) const;
+                                 const MCSubtargetInfo &STI) const {
+
+    APInt Inst;
+    APInt Scratch;
+    getBinaryCodeForInstr(MI, Fixups, Inst, Scratch, STI);
+    return Inst.getRawData()[0];
+  }
 
   /// Return binary encoding of operand. If the machine operand requires
   /// relocation, record the relocation and return zero.
@@ -81,25 +92,63 @@ public:
                              SmallVectorImpl<MCFixup> &Fixups,
                              const MCSubtargetInfo &STI) const;
 
+  void getMachineOpValue(const MCInst &MI, const MCOperand &MO, APInt &op,
+                         SmallVectorImpl<MCFixup> &Fixups,
+                         const MCSubtargetInfo &STI) const {
+
+    op = getMachineOpValue(MI, MO, Fixups, STI);
+  }
+
   unsigned getImmOpValueAsr1(const MCInst &MI, unsigned OpNo,
                              SmallVectorImpl<MCFixup> &Fixups,
                              const MCSubtargetInfo &STI) const;
+
+  void getImmOpValueAsr1(const MCInst &MI, unsigned OpNo, APInt &op,
+                         SmallVectorImpl<MCFixup> &Fixups,
+                         const MCSubtargetInfo &STI) const {
+    op = getImmOpValueAsr1(MI, OpNo, Fixups, STI);
+  };
 
   unsigned getImmOpValue(const MCInst &MI, unsigned OpNo,
                          SmallVectorImpl<MCFixup> &Fixups,
                          const MCSubtargetInfo &STI) const;
 
+  void getImmOpValue(const MCInst &MI, unsigned OpNo, APInt &op,
+                     SmallVectorImpl<MCFixup> &Fixups,
+                     const MCSubtargetInfo &STI) const {
+    op = getImmOpValue(MI, OpNo, Fixups, STI);
+  };
+
   unsigned getVMaskReg(const MCInst &MI, unsigned OpNo,
                        SmallVectorImpl<MCFixup> &Fixups,
                        const MCSubtargetInfo &STI) const;
+
+  void getVMaskReg(const MCInst &MI, unsigned OpNo, APInt &op,
+                   SmallVectorImpl<MCFixup> &Fixups,
+                   const MCSubtargetInfo &STI) const {
+
+    op = getVMaskReg(MI, OpNo, Fixups, STI);
+  }
 
   unsigned getRlistOpValue(const MCInst &MI, unsigned OpNo,
                            SmallVectorImpl<MCFixup> &Fixups,
                            const MCSubtargetInfo &STI) const;
 
+  void getRlistOpValue(const MCInst &MI, unsigned OpNo, APInt &op,
+                       SmallVectorImpl<MCFixup> &Fixups,
+                       const MCSubtargetInfo &STI) const {
+    op = getRlistOpValue(MI, OpNo, Fixups, STI);
+  }
+
   unsigned getRegReg(const MCInst &MI, unsigned OpNo,
                      SmallVectorImpl<MCFixup> &Fixups,
                      const MCSubtargetInfo &STI) const;
+
+  unsigned getRegReg(const MCInst &MI, unsigned OpNo, APInt &op,
+                     SmallVectorImpl<MCFixup> &Fixups,
+                     const MCSubtargetInfo &STI) const {
+    op = getRegReg(MI, OpNo, Fixups, STI);
+  }
 };
 } // end anonymous namespace
 
@@ -336,6 +385,21 @@ void RISCVMCCodeEmitter::encodeInstruction(const MCInst &MI,
   switch (Size) {
   default:
     llvm_unreachable("Unhandled encodeInstruction length!");
+  case 20:
+  case 12:
+  case 8: {
+    APInt Inst;
+    APInt Scratch;
+    getBinaryCodeForInstr(MI, Fixups, Inst, Scratch, STI);
+    const uint32_t *Data =
+        reinterpret_cast<const uint32_t *>(Inst.getRawData());
+    for (unsigned I = 0; I < Size / 4; ++I) {
+      uint32_t Bits = Data[I];
+      support::endian::write(CB, Bits, llvm::endianness::little);
+    }
+
+    break;
+  }
   case 2: {
     uint16_t Bits = getBinaryCodeForInstr(MI, Fixups, STI);
     support::endian::write<uint16_t>(CB, Bits, llvm::endianness::little);
@@ -394,8 +458,7 @@ unsigned RISCVMCCodeEmitter::getImmOpValue(const MCInst &MI, unsigned OpNo,
   if (MO.isImm())
     return MO.getImm();
 
-  assert(MO.isExpr() &&
-         "getImmOpValue expects only expressions or immediates");
+  assert(MO.isExpr() && "getImmOpValue expects only expressions or immediates");
   const MCExpr *Expr = MO.getExpr();
   MCExpr::ExprKind Kind = Expr->getKind();
   RISCV::Fixups FixupKind = RISCV::fixup_riscv_invalid;
@@ -487,8 +550,8 @@ unsigned RISCVMCCodeEmitter::getImmOpValue(const MCInst &MI, unsigned OpNo,
       break;
     }
   } else if ((Kind == MCExpr::SymbolRef &&
-                 cast<MCSymbolRefExpr>(Expr)->getKind() ==
-                     MCSymbolRefExpr::VK_None) ||
+              cast<MCSymbolRefExpr>(Expr)->getKind() ==
+                  MCSymbolRefExpr::VK_None) ||
              Kind == MCExpr::Binary) {
     // FIXME: Sub kind binary exprs have chance of underflow.
     if (MIFrm == RISCVII::InstFormatJ) {
@@ -515,9 +578,8 @@ unsigned RISCVMCCodeEmitter::getImmOpValue(const MCInst &MI, unsigned OpNo,
   // relaxed.
   if (EnableRelax && RelaxCandidate) {
     const MCConstantExpr *Dummy = MCConstantExpr::create(0, Ctx);
-    Fixups.push_back(
-    MCFixup::create(0, Dummy, MCFixupKind(RISCV::fixup_riscv_relax),
-                    MI.getLoc()));
+    Fixups.push_back(MCFixup::create(
+        0, Dummy, MCFixupKind(RISCV::fixup_riscv_relax), MI.getLoc()));
     ++MCNumFixups;
   }
 
