@@ -20,3 +20,15 @@ define void  @main_graph(ptr %o, ptr %i, <4 x i32> %i_shape, <4 x i32> %perm) {
  
   ret void
 }
+
+;CHECK:        store.v4i32     Q11, 16(sp)             # 16-byte Folded Spill
+;CHECK-NEXT:        store.v4i32     Q10, 0(sp)              # 16-byte Folded Spill
+;CHECK-NEXT:        mv      s0, a1
+;CHECK-NEXT:        mv      s1, a0
+;CHECK-NEXT:        li      a0, 22
+;CHECK-NEXT:        call    _Z12getMemoryf32l
+;CHECK-NEXT:        mv      a0, s1
+;CHECK-NEXT:        mv      a1, s0
+;CHECK-NEXT:        load.v4i32      Q10, 0(sp)              # 16-byte Folded Reload
+;CHECK-NEXT:        load.v4i32      Q11, 16(sp)             # 16-byte Folded Reload
+;CHECK-NEXT:        call    foo

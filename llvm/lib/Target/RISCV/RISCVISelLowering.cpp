@@ -2456,7 +2456,7 @@ unsigned RISCVTargetLowering::getSubregIndexByMVT(MVT VT, unsigned Index) {
 unsigned RISCVTargetLowering::getRegClassIDForVecVT(MVT VT) {
   if (VT.getVectorElementType() == MVT::i1)
     return RISCV::VRRegClassID;
-  if(MVT::v4i32== VT.SimpleTy)
+  if (MVT::v4i32 == VT.SimpleTy)
     return RISCV::QPRRegClassID;
   return getRegClassIDForLMUL(getLMUL(VT));
 }
@@ -2657,7 +2657,7 @@ static MVT getContainerForFixedLengthVector(SelectionDAG &DAG, MVT VT,
 }
 
 MVT RISCVTargetLowering::getContainerForFixedLengthVector(MVT VT) const {
-    if(MVT::v4i32== VT.SimpleTy)
+  if (MVT::v4i32 == VT.SimpleTy)
     return VT;
   return ::getContainerForFixedLengthVector(*this, VT, getSubtarget());
 }
@@ -3868,6 +3868,14 @@ static SDValue lowerBUILD_VECTOR(SDValue Op, SelectionDAG &DAG,
                                  const RISCVSubtarget &Subtarget) {
   MVT VT = Op.getSimpleValueType();
   assert(VT.isFixedLengthVector() && "Unexpected vector!");
+
+  {
+    unsigned NumElems = Op.getNode()->getNumOperands();
+    EVT VT = Op.getNode()->getValueType(0);
+    EVT EltVT = VT.getVectorElementType();
+    if (EltVT.isInteger() && 4 == NumElems)
+      return Op;
+  }
 
   if (ISD::isBuildVectorOfConstantSDNodes(Op.getNode()) ||
       ISD::isBuildVectorOfConstantFPSDNodes(Op.getNode()))
@@ -10420,14 +10428,21 @@ RISCVTargetLowering::lowerFixedLengthVectorLoadToRVV(SDValue Op,
     return DAG.getMergeValues({Result, NewLoad.getValue(1)}, DL);
   }
 
-  SDValue VL =
-      getVLOp(VT.getVectorNumElements(), ContainerVT, DL, DAG, Subtarget);
+  bool IsQuadWord = (MVT::v4i32 == ContainerVT.SimpleTy);
+  /**for Quadwords,VectorLen is set to zero, because it is a fixed length vector
+   * - FrameIndex will keep the start address
+   * -  offset shall be NULL,
+   * - instruction will transfer only 4 words
+   */
+  unsigned int VectorLen = IsQuadWord ? 0 : VT.getVectorNumElements();
+  SDValue VL = getVLOp(VectorLen, ContainerVT, DL, DAG, Subtarget);
 
   bool IsMaskOp = VT.getVectorElementType() == MVT::i1;
-  SDValue IntID = DAG.getTargetConstant(
-      IsMaskOp ? Intrinsic::riscv_vlm : Intrinsic::riscv_vle, DL, XLenVT);
+  unsigned Val = IsMaskOp ? Intrinsic::riscv_vlm : Intrinsic::riscv_vle;
+  Val = IsQuadWord ? Intrinsic::isolde_vle : Val;
+  SDValue IntID = DAG.getTargetConstant(Val, DL, XLenVT);
   SmallVector<SDValue, 4> Ops{Load->getChain(), IntID};
-  if (!IsMaskOp)
+  if (!IsQuadWord && !IsMaskOp)
     Ops.push_back(DAG.getUNDEF(ContainerVT));
   Ops.push_back(Load->getBasePtr());
   Ops.push_back(VL);
@@ -10436,7 +10451,9 @@ RISCVTargetLowering::lowerFixedLengthVectorLoadToRVV(SDValue Op,
       DAG.getMemIntrinsicNode(ISD::INTRINSIC_W_CHAIN, DL, VTs, Ops,
                               Load->getMemoryVT(), Load->getMemOperand());
 
-  SDValue Result = convertFromScalableVector(VT, NewLoad, DAG, Subtarget);
+  SDValue Result = IsQuadWord
+                       ? NewLoad
+                       : convertFromScalableVector(VT, NewLoad, DAG, Subtarget);
   return DAG.getMergeValues({Result, NewLoad.getValue(1)}, DL);
 }
 
@@ -10464,9 +10481,26 @@ RISCVTargetLowering::lowerFixedLengthVectorStoreToRVV(SDValue Op,
   }
 
   MVT ContainerVT = getContainerForFixedLengthVector(VT);
-
-  SDValue NewValue =
-      convertToScalableVector(ContainerVT, StoreVal, DAG, Subtarget);
+  bool IsQuadWord = (MVT::v4i32 == ContainerVT.SimpleTy);
+  /**for Quadwords,VectorLen is set to zero, because it is a fixed length vector
+   * - FrameIndex will keep the start address
+   * -  offset shall be NULL,
+   * - instruction will transfer only 4 words
+   */
+  LLVM_DEBUG({
+    if (IsQuadWord) {
+      Store->dump();
+      llvm::errs() << "Value\n";
+      StoreVal.dump();
+      llvm::errs() << "BasePtr\n";
+      Store->getBasePtr()->dump();
+      llvm::errs() << "Offset\n";
+      Store->getOffset()->dump();
+    }
+  };);
+  SDValue NewValue = IsQuadWord ? StoreVal
+                                : convertToScalableVector(ContainerVT, StoreVal,
+                                                          DAG, Subtarget);
 
   // If we know the exact VLEN and our fixed length vector completely fills
   // the container, use a whole register store instead.
@@ -10477,12 +10511,13 @@ RISCVTargetLowering::lowerFixedLengthVectorStoreToRVV(SDValue Op,
     return DAG.getStore(Store->getChain(), DL, NewValue, Store->getBasePtr(),
                         Store->getMemOperand());
 
-  SDValue VL =
-      getVLOp(VT.getVectorNumElements(), ContainerVT, DL, DAG, Subtarget);
+  unsigned int VectorLen = IsQuadWord ? 0 : VT.getVectorNumElements();
+  SDValue VL = getVLOp(VectorLen, ContainerVT, DL, DAG, Subtarget);
 
   bool IsMaskOp = VT.getVectorElementType() == MVT::i1;
-  SDValue IntID = DAG.getTargetConstant(
-      IsMaskOp ? Intrinsic::riscv_vsm : Intrinsic::riscv_vse, DL, XLenVT);
+  uint64_t Val = IsMaskOp ? Intrinsic::riscv_vsm : Intrinsic::riscv_vse;
+  Val = IsQuadWord ? Intrinsic::isolde_vse : Val;
+  SDValue IntID = DAG.getTargetConstant(Val, DL, XLenVT);
   return DAG.getMemIntrinsicNode(
       ISD::INTRINSIC_VOID, DL, DAG.getVTList(MVT::Other),
       {Store->getChain(), IntID, NewValue, Store->getBasePtr(), VL},
@@ -17991,11 +18026,8 @@ static const MCPhysReg ArgVRM4s[] = {RISCV::V8M4, RISCV::V12M4, RISCV::V16M4,
                                      RISCV::V20M4};
 static const MCPhysReg ArgVRM8s[] = {RISCV::V8M8, RISCV::V16M8};
 
-static const MCPhysReg ArgQ[] = {
-  RISCV::Q10, RISCV::Q11, RISCV::Q12, RISCV::Q13,
-  RISCV::Q14, RISCV::Q15
-};
-
+static const MCPhysReg ArgQ[] = {RISCV::Q10, RISCV::Q11, RISCV::Q12,
+                                 RISCV::Q13, RISCV::Q14, RISCV::Q15};
 
 ArrayRef<MCPhysReg> RISCV::getArgGPRs(const RISCVABI::ABI ABI) {
   // The GPRs used for passing arguments in the ILP32* and LP64* ABIs, except
@@ -18090,7 +18122,7 @@ static unsigned allocateRVVReg(MVT ValVT, unsigned ValNo,
       return State.AllocateReg(RISCV::V0);
     return State.AllocateReg(ArgVRs);
   }
-   if (RC == &RISCV::QPRRegClass)
+  if (RC == &RISCV::QPRRegClass)
     return State.AllocateReg(ArgQ);
   if (RC == &RISCV::VRM2RegClass)
     return State.AllocateReg(ArgVRM2s);
