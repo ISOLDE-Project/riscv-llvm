@@ -17,8 +17,8 @@
 include "RISCVInstrFormatsISOLDE.td"
 
 
-def simm32 : RISCVSImmLeafOp<32> {
-}
+def simm32 : 
+  Operand<i32>, ImmLeaf<i32, "return isInt<32>(Imm);">;
 
 let hasSideEffects = 1, mayLoad = 1, mayStore = 0 in
 def LDQword: ISOLDEInst160<
@@ -34,7 +34,7 @@ def LDQword: ISOLDEInst160<
 let hasSideEffects = 1, mayLoad = 1, mayStore = 1 in
 def REDMULE_GEMM: ISOLDEInst128<
              (outs)
-            ,(ins  GPR:$rd, GPR:$rs1, GPR:$rs2, simm12:$imm1, simm12:$imm2, simm12:$imm3)
+            ,(ins  GPR:$rd, GPR:$rs1, GPR:$rs2, simm32:$imm1, simm32:$imm2, simm32:$imm3)
             ,ISOLDE_REDMULE_GEMM.name, "$rd, $rs1, $rs2, $imm1, $imm2, $imm3"
             ,ISOLDE_REDMULE_GEMM.funct7
             ,[
@@ -42,9 +42,9 @@ def REDMULE_GEMM: ISOLDEInst128<
                      ( int_isolde_redmule_gemm                 (  iPTR    GPR:$rd)
                                                               ,(  iPTR    GPR:$rs1)
                                                               ,(  iPTR    GPR:$rs2)
-                                                              ,(  i32    simm12:$imm1)
-                                                              ,(  i32    simm12:$imm2)
-                                                              ,(  i32    simm12:$imm3)
+                                                              ,(  i32    simm32:$imm1)
+                                                              ,(  i32    simm32:$imm2)
+                                                              ,(  i32    simm32:$imm3)
 
                                     )
                        

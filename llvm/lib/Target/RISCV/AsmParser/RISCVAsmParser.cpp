@@ -879,19 +879,6 @@ public:
                        VK == RISCVMCExpr::VK_RISCV_TLSDESC_ADD_LO);
   }
   
-  bool isSImm32() const {
-    RISCVMCExpr::VariantKind VK = RISCVMCExpr::VK_RISCV_None;
-    int64_t Imm;
-    if (!isImm())
-      return false;
-    bool IsConstantImm = evaluateConstantImm(getImm(), Imm, VK);
-    if (!IsConstantImm)
-      return false;
-    else
-      return isInt<32>(Imm);
-  }
-
-
   bool isSImm12Lsb0() const { return isBareSimmNLsb0<12>(); }
 
   bool isSImm12Lsb00000() const {
