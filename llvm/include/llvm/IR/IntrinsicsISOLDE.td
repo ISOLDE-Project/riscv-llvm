@@ -14,6 +14,24 @@
 //===----------------------------------------------------------------------===//
 
 
+/**
+* REDMULE_GEMM
+**/
+
+def int_isolde_redmule_gemm : Intrinsic<
+/*** return types*/       [    
+                          ],
+/*** param types*/        [ 
+/* ptr %z         */        llvm_ptr_ty  
+/*  ptr %x        */       ,llvm_ptr_ty
+/*  ptr %w        */       ,llvm_ptr_ty
+/*  i32 %M        */       ,llvm_i32_ty
+/*  i32 %N        */       ,llvm_i32_ty
+/*  i32 %K        */       ,llvm_i32_ty
+                          ],
+                          [ IntrHasSideEffects]>;
+
+
 class ISOLDEStoreQ 
     : DefaultAttrsIntrinsic<
           [], 
@@ -30,6 +48,9 @@ class ISOLDELoadQ
 {
 }   
 
+
+
 //QWORD
 def int_isolde_vse : ISOLDEStoreQ;
 def int_isolde_vle : ISOLDELoadQ;
+

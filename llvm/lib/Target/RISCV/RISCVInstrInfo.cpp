@@ -34,6 +34,8 @@
 #include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/ErrorHandling.h"
 
+#define DEBUG_TYPE "RISCVInstrInfo"
+
 using namespace llvm;
 
 #define GEN_CHECK_COMPRESS_INSTR

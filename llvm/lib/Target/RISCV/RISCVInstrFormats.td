@@ -55,7 +55,8 @@ def InstFormatCSH    : InstFormat<21>;
 def InstFormatOther  : InstFormat<22>;
 def InstFormat64bit  : InstFormat<23>;
 def InstFormat96bit  : InstFormat<24>;
-def InstFormat160bit : InstFormat<25>;
+def InstFormat128bit  : InstFormat<25>;
+def InstFormat160bit : InstFormat<26>;
 
 class RISCVVConstraint<bits<3> val> {
   bits<3> Value = val;
