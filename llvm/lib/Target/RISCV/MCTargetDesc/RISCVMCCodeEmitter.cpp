@@ -144,7 +144,7 @@ public:
                      SmallVectorImpl<MCFixup> &Fixups,
                      const MCSubtargetInfo &STI) const;
 
-  unsigned getRegReg(const MCInst &MI, unsigned OpNo, APInt &op,
+  void getRegReg(const MCInst &MI, unsigned OpNo, APInt &op,
                      SmallVectorImpl<MCFixup> &Fixups,
                      const MCSubtargetInfo &STI) const {
     op = getRegReg(MI, OpNo, Fixups, STI);
@@ -386,6 +386,7 @@ void RISCVMCCodeEmitter::encodeInstruction(const MCInst &MI,
   default:
     llvm_unreachable("Unhandled encodeInstruction length!");
   case 20:
+  case 16:
   case 12:
   case 8: {
     APInt Inst;

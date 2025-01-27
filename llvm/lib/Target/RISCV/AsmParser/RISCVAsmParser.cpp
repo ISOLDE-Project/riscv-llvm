@@ -878,7 +878,7 @@ public:
                        VK == RISCVMCExpr::VK_RISCV_TLSDESC_LOAD_LO ||
                        VK == RISCVMCExpr::VK_RISCV_TLSDESC_ADD_LO);
   }
-
+  
   bool isSImm12Lsb0() const { return isBareSimmNLsb0<12>(); }
 
   bool isSImm12Lsb00000() const {

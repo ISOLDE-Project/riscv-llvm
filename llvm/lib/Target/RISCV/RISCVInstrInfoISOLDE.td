@@ -16,7 +16,11 @@
 
 include "RISCVInstrFormatsISOLDE.td"
 
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+
+def simm32 : 
+  Operand<i32>, ImmLeaf<i32, "return isInt<32>(Imm);">;
+
+let hasSideEffects = 1, mayLoad = 1, mayStore = 0 in
 def LDQword: ISOLDEInst160<
              (outs QPR:$qd )
             ,(ins i32imm:$imm1, i32imm:$imm2, i32imm:$imm3, i32imm:$imm4)
@@ -25,6 +29,27 @@ def LDQword: ISOLDEInst160<
             , /*pattern */[]>{
  let rs1=0;
  let rs2=0;                 
+}
+
+let hasSideEffects = 1, mayLoad = 1, mayStore = 1 in
+def REDMULE_GEMM: ISOLDEInst128<
+             (outs)
+            ,(ins  GPR:$rd, GPR:$rs1, GPR:$rs2, simm32:$imm1, simm32:$imm2, simm32:$imm3)
+            ,ISOLDE_REDMULE_GEMM.name, "$rd, $rs1, $rs2, $imm1, $imm2, $imm3"
+            ,ISOLDE_REDMULE_GEMM.funct7
+            ,[
+                (set 
+                     ( int_isolde_redmule_gemm                 (  iPTR    GPR:$rd)
+                                                              ,(  iPTR    GPR:$rs1)
+                                                              ,(  iPTR    GPR:$rs2)
+                                                              ,(  i32    simm32:$imm1)
+                                                              ,(  i32    simm32:$imm2)
+                                                              ,(  i32    simm32:$imm3)
+
+                                    )
+                       
+                    )
+             ]>{                 
 }
 
 //push, pop Q registers
