@@ -14,6 +14,7 @@
 //===----------------------------------------------------------------------===//
 
 
+let TargetPrefix = "isolde" in {
 /**
 * REDMULE_GEMM
 **/
@@ -31,6 +32,7 @@ def int_isolde_redmule_gemm : Intrinsic<
                           ],
                           [ IntrHasSideEffects]>;
 
+}
 
 class ISOLDEStoreQ 
     : DefaultAttrsIntrinsic<

@@ -69,6 +69,10 @@ clang_tablegen(BuiltinsRISCV.inc -gen-clang-builtins
   SOURCE BuiltinsRISCV.td
   TARGET ClangBuiltinsRISCV)
 
+clang_tablegen(BuiltinsISOLDE.inc -gen-clang-builtins
+  SOURCE BuiltinsISOLDE.td
+  TARGET ClangBuiltinsISOLDE)
+
 # ARM NEON and MVE
 clang_tablegen(arm_neon.inc -gen-arm-neon-sema
   SOURCE arm_neon.td
