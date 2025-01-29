@@ -23,6 +23,7 @@
 #include "llvm/CodeGen/GlobalISel/MachineIRBuilder.h"
 #include "llvm/CodeGen/MachineJumpTableInfo.h"
 #include "llvm/IR/IntrinsicsRISCV.h"
+#include "llvm/IR/IntrinsicsISOLDE.h"
 #include "llvm/Support/Debug.h"
 
 #define DEBUG_TYPE "riscv-isel"
