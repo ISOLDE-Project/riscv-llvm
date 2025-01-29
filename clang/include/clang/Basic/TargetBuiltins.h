@@ -160,21 +160,12 @@ namespace clang {
     LastRVVBuiltin = RISCVVector::FirstTSBuiltin - 1,
 #define BUILTIN(ID, TYPE, ATTRS) BI##ID,
 #include "clang/Basic/BuiltinsRISCV.inc"
-    LastTSBuiltin
-  };
-  } // namespace RISCV
-
-  /// ISOLDE builtins
-  namespace ISOLDE {
-  enum {
-    LastTIBuiltin = clang::Builtin::FirstTSBuiltin - 1,
-    FirstRVVBuiltin = clang::Builtin::FirstTSBuiltin,
-    LastRVVBuiltin = RISCVVector::FirstTSBuiltin - 1,
 #define BUILTIN(ID, TYPE, ATTRS) BI##ID,
 #include "clang/Basic/BuiltinsISOLDE.inc"
     LastTSBuiltin
   };
-  } // namespace ISOLDE
+  } // namespace RISCV
+
   
   /// LoongArch builtins
   namespace LoongArch {

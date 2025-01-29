@@ -9,8 +9,8 @@
 // This file defines all of the ISOLDE-specific intrinsics.
 // how to build
 // 1.  cd build
-// 2.  make intrinsics_gen -j6
-// 3.  make llc -j30
+// 2.  make -j$(nproc) intrinsics_gen 
+// 3.  make -j$(nproc) llc 
 //===----------------------------------------------------------------------===//
 
 

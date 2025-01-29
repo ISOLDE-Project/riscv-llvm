@@ -50,6 +50,7 @@
 #include "llvm/IR/IntrinsicsPowerPC.h"
 #include "llvm/IR/IntrinsicsR600.h"
 #include "llvm/IR/IntrinsicsRISCV.h"
+#include "llvm/IR/IntrinsicsISOLDE.h"
 #include "llvm/IR/IntrinsicsS390.h"
 #include "llvm/IR/IntrinsicsVE.h"
 #include "llvm/IR/IntrinsicsWebAssembly.h"
@@ -21329,6 +21330,45 @@ Value *CodeGenFunction::EmitHexagonBuiltinExpr(unsigned BuiltinID,
   return nullptr;
 }
 
+namespace {
+
+struct IntrinsicInfo {
+  unsigned BuiltinID;
+  llvm::Intrinsic::ISOLDEIntrinsics LLVMIntrinsic;
+};
+
+static const IntrinsicInfo IntrinsicMap[] = {
+    {clang::RISCV::BI__builtin_isolde_redmule_gemm,
+     llvm::Intrinsic::isolde_redmule_gemm}
+
+};
+
+const IntrinsicInfo *findIntrinsicInfo(unsigned BuiltinID) {
+
+  unsigned long mapSize = sizeof(IntrinsicMap) / sizeof(IntrinsicMap[0]);
+  for (unsigned long idx = 0; idx < mapSize; ++idx) {
+    if (IntrinsicMap[idx].BuiltinID == BuiltinID)
+      return &IntrinsicMap[idx];
+  }
+  return nullptr;
+}
+
+Value *EmitISOLDEBuiltinExpr(CodeGenFunction *pThis, unsigned BuiltinID,
+                            SmallVector<Value *, 4> &Ops) {
+
+  const IntrinsicInfo *pInfo = findIntrinsicInfo(BuiltinID);
+  if (pInfo == nullptr)
+    return nullptr;
+  Function *F = pThis->CGM.getIntrinsic(pInfo->LLVMIntrinsic);
+  F->dump();
+  for(auto* it= Ops.begin();it!=Ops.end();++it)
+    (*it)->dump();
+  Value *Call = pThis->Builder.CreateCall(F, Ops, "");
+  return Call;
+}
+
+} // anonymous namespace
+
 Value *CodeGenFunction::EmitRISCVBuiltinExpr(unsigned BuiltinID,
                                              const CallExpr *E,
                                              ReturnValueSlot ReturnValue) {
@@ -21366,6 +21406,12 @@ Value *CodeGenFunction::EmitRISCVBuiltinExpr(unsigned BuiltinID,
     }
     Ops.push_back(EmitScalarOrConstFoldImmArg(ICEArguments, i, E));
   }
+
+/**
+*ISOLDE builtins
+*/
+  Value *ISOLDEResult = EmitISOLDEBuiltinExpr(this, BuiltinID,Ops);
+  if(ISOLDEResult) return ISOLDEResult;
 
   Intrinsic::ID ID = Intrinsic::not_intrinsic;
   unsigned NF = 1;
