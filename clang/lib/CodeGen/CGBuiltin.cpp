@@ -62,6 +62,8 @@
 #include "llvm/Support/ScopedPrinter.h"
 #include "llvm/TargetParser/AArch64TargetParser.h"
 #include "llvm/TargetParser/X86TargetParser.h"
+#include "llvm/Support/Debug.h"
+
 #include <optional>
 #include <sstream>
 
@@ -21360,9 +21362,17 @@ Value *EmitISOLDEBuiltinExpr(CodeGenFunction *pThis, unsigned BuiltinID,
   if (pInfo == nullptr)
     return nullptr;
   Function *F = pThis->CGM.getIntrinsic(pInfo->LLVMIntrinsic);
-  F->dump();
+  if(F == nullptr){
+    DEBUG_WITH_TYPE("EmitISOLDEBuiltinExpr", 
+     dbgs() << "Failed to get llvm intrinsic for "<< pInfo->LLVMIntrinsic <<"\n";
+    );
+    return nullptr;
+  }
+  DEBUG_WITH_TYPE("EmitISOLDEBuiltinExpr", 
   for(auto* it= Ops.begin();it!=Ops.end();++it)
     (*it)->dump();
+  F->dump();
+  );
   Value *Call = pThis->Builder.CreateCall(F, Ops, "");
   return Call;
 }
