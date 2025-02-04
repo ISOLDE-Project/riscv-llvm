@@ -6,8 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file defines the RISC-V-specific builtin function database.
+// This file defines the ISOLDE-specific builtin function database.
 //
+// how to build
+// 1.  cd <build-folder>
+// 2.  make -j$(nproc) ClangBuiltinsISOLDE 
+// 3.  make -j$(nproc) clang 
 //===----------------------------------------------------------------------===//
 
 include "clang/Basic/BuiltinsBase.td"
