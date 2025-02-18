@@ -30,16 +30,16 @@ class ISOLDELSOps <string name,bits<7> _opcode , bits<3> _funct3> {
 }
 
 //160 bit
-def ISOLDE_LOAD_4XW         : ISOLDEOps<"ld4xi32",           OPC_160BIT.Value,    0b0000011>;
+def ISOLDE_LOAD_4XI32       : ISOLDEOps<"ld4xi32",           OPC_160BIT.Value,    0b0000011>;
 //128 bit
 def ISOLDE_REDMULE_GEMM     : ISOLDEOps<"redmule.gemm",      OPC_128BIT.Value,    0b0000100>;
-def ISOLDE_LOAD_3XW         : ISOLDEOps<"ld3xi32",           OPC_128BIT.Value,    0b0000101>;
+def ISOLDE_LOAD_3XI32       : ISOLDEOps<"ld3xi32",           OPC_128BIT.Value,    0b0000101>;
 //96 bit
-def ISOLDE_LOAD_2XW         : ISOLDEOps<"ld2xi32",           OPC_96BIT.Value,     0b0000100>;
+def ISOLDE_LOAD_2XI32       : ISOLDEOps<"ld2xi32",           OPC_96BIT.Value,     0b0000100>;
 
 //32 bit OPC_CUSTOM_1.Value is reserved for custom  S-type /I-type
-def ISOLDE_PUSHQ           : ISOLDELSOps<"PUSHQInstr",    OPC_CUSTOM_1.Value,   0b001>;
-def ISOLDE_POPQ            : ISOLDELSOps<"POPQInstr",     OPC_CUSTOM_1.Value,   0b011>;
+def ISOLDE_PUSHQ            : ISOLDELSOps<"PUSHQInstr",      OPC_CUSTOM_1.Value,   0b001>;
+def ISOLDE_POPQ             : ISOLDELSOps<"POPQInstr",       OPC_CUSTOM_1.Value,   0b011>;
 
 
 //32 bit custom-0

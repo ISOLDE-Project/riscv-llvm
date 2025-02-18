@@ -24,8 +24,8 @@ let hasSideEffects = 1, mayLoad = 1, mayStore = 0 in
 def LD4XWORD: ISOLDEInst160<
              (outs QPR:$qd )
             ,(ins i32imm:$imm1, i32imm:$imm2, i32imm:$imm3, i32imm:$imm4)
-            ,ISOLDE_LOAD_4XW.name, "$qd, $imm1, $imm2, $imm3, $imm4"
-            ,ISOLDE_LOAD_4XW.funct7
+            ,ISOLDE_LOAD_4XI32.name, "$qd, $imm1, $imm2, $imm3, $imm4"
+            ,ISOLDE_LOAD_4XI32.funct7
             , /*pattern */[]>{
  let rs1=0;
  let rs2=0;                 
@@ -35,8 +35,8 @@ let hasSideEffects = 1, mayLoad = 1, mayStore = 0 in
 def LD3XWORD: ISOLDEInst128<
              (outs QPR:$rd )
             ,(ins i32imm:$imm1, i32imm:$imm2, i32imm:$imm3 )
-            ,ISOLDE_LOAD_3XW.name, "$rd, $imm1, $imm2, $imm3"
-            ,ISOLDE_LOAD_3XW.funct7
+            ,ISOLDE_LOAD_3XI32.name, "$rd, $imm1, $imm2, $imm3"
+            ,ISOLDE_LOAD_3XI32.funct7
             , /*pattern */[]>{
  let rs1=0;
  let rs2=0;                 
@@ -46,8 +46,8 @@ let hasSideEffects = 1, mayLoad = 1, mayStore = 0 in
 def LD2XWORD: ISOLDEInst96<
              (outs QPR:$rd )
             ,(ins i32imm:$imm1, i32imm:$imm2 )
-            ,ISOLDE_LOAD_2XW.name, "$rd, $imm1, $imm2"
-            ,ISOLDE_LOAD_2XW.funct7
+            ,ISOLDE_LOAD_2XI32.name, "$rd, $imm1, $imm2"
+            ,ISOLDE_LOAD_2XI32.funct7
             , /*pattern */[]>{
  let rs1=0;
  let rs2=0;                 

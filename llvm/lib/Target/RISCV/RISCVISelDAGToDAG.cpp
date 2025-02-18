@@ -2060,35 +2060,26 @@ void RISCVDAGToDAGISel::Select(SDNode *Node) {
   }
   case ISD::BUILD_VECTOR: {
     SDLoc DL(Node);
-    MachineFunction &MF = CurDAG->getMachineFunction();
+    //MachineFunction &MF = CurDAG->getMachineFunction();
     auto EltVT = Node->getValueType(0).getVectorElementType();
     llvm::SmallVector<SDValue> Ops;
     for (unsigned int I = 0; I < Node->getNumOperands(); ++I) {
-      //if (I < 4) {
         uint64_t Const1 = 0;
         if (isa<ConstantSDNode>(Node->getOperand(I))) {
           Const1 = Node->getConstantOperandVal(I);
           SDValue Imm1 = CurDAG->getTargetConstant(Const1, DL, EltVT);
           Ops.push_back(Imm1);          
-      //} else {
-       // break;
       }
       }
     //}
     MachineSDNode* loadVector=nullptr;
     unsigned int vecSize = Ops.size();
-    if(2 == vecSize){
-         SDValue imm1 = CurDAG->getTargetConstant(0, DL, EltVT);
-         Ops.push_back(imm1);
-         loadVector = CurDAG->getMachineNode(RISCV::LD3XWORD, DL, MVT::v4i32, Ops);
-         printf("vectorSize=!!!\n");
-    }
+    if(2 == vecSize)
+         loadVector = CurDAG->getMachineNode(RISCV::LD2XWORD, DL, MVT::v4i32, Ops);
     else if(3 == vecSize)
          loadVector = CurDAG->getMachineNode(RISCV::LD3XWORD, DL, MVT::v4i32, Ops);
     else if(4 == vecSize) 
          loadVector = CurDAG->getMachineNode(RISCV::LD4XWORD, DL, MVT::v4i32, Ops);
-    else 
-      printf("unsuported vector size:%d",vecSize);
     if(loadVector)
         ReplaceNode(Node, loadVector);
     return;
