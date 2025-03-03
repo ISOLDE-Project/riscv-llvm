@@ -74,6 +74,7 @@ def REDMULE_GEMM: ISOLDEInst128<
              ]>{                 
 }
 
+
 //push, pop Q registers
 def PUSHQWORD
     : ISOLDEInst32S <  ISOLDE_PUSHQ.funct3,
@@ -121,3 +122,31 @@ def POPQWORD
   let mayLoad  = true;
 }
 
+//ONNX
+let hasSideEffects = 1, mayLoad = 1, mayStore = 1 in
+def ONNX_CONV2D_F32: ISOLDEInst96R<
+             (outs QPR:$rd2)
+            ,(ins GPR:$rd, GPR:$rs1, QPR:$rs3, GPR:$rs2, QPR:$rs4, GPR:$rs5, QPR:$rs6, QPR:$rs7)
+            ,ISOLDE_ONNX_CONV2D.name, ISOLDE_OP_F32.opstype
+            ,"$rd, $rd2, $rs1, $rs3, $rs2, $rs4, $rs5, $rs6, $rs7"
+            ,ISOLDE_ONNX_CONV2D.funct7, ISOLDE_OP_F32.funct3
+            ,[
+                (set 
+                    (v4i32 QPR:$rd2),  ( int_isolde_onnx_conv2df32     (  iPTR     GPR:$rd)
+                                                  ,(  iPTR     GPR:$rs1)
+                                                  ,(  v4i32    QPR:$rs3)
+                                                  ,(  iPTR     GPR:$rs2)
+                                                  ,(  v4i32    QPR:$rs4)
+                                                  ,(  iPTR     GPR:$rs5)
+                                                  ,(  v4i32    QPR:$rs6)
+                                                  ,(  v4i32    QPR:$rs7)
+                                                  
+                          
+                          )
+                       
+                )
+             ]>{        
+    let rd3=0;
+    let rs8=0;             
+}
+//def ONNX_CONV2DF32: ONNX_CONV2D<ISOLDE_OP_F32.opstype,ISOLDE_OP_F32.funct3, int_isolde_onnx_conv2df32 >;

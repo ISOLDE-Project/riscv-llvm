@@ -32,6 +32,24 @@ def int_isolde_redmule_gemm : Intrinsic<
                           ],
                           [ IntrHasSideEffects]>;
 
+//ONNX                          
+
+def int_isolde_onnx_conv2df32  : Intrinsic<
+/*** return types*/                [
+/*  %y_s */            llvm_v4i32_ty
+/*** param types*/                 ],[ 
+/* %y    */            llvm_ptr_ty
+/* %x    */          , llvm_ptr_ty
+/* %x_s  */          , llvm_v4i32_ty
+/* %w    */          , llvm_ptr_ty
+/* %w_s  */          , llvm_v4i32_ty
+/* %b    */          , llvm_ptr_ty 
+/** conv2d  attributes            **/
+/* %p    */          , llvm_v4i32_ty
+/* %s_d  */          , llvm_v4i32_ty 
+
+                                   ],
+                                   [ IntrHasSideEffects]>;
 }
 
 class ISOLDEStoreQ 
