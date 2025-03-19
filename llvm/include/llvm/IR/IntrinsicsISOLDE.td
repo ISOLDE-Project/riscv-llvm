@@ -32,6 +32,17 @@ def int_isolde_redmule_gemm : Intrinsic<
                           ],
                           [ IntrHasSideEffects]>;
 
+def int_isolde_redmule_gemm2 : Intrinsic<
+/*** return types*/       [    
+                          ],
+/*** param types*/        [ 
+/* ptr %z         */        llvm_ptr_ty  
+/*  ptr %x        */       ,llvm_ptr_ty
+/*  ptr %w        */       ,llvm_ptr_ty
+/*  v4i32 %Q      */       ,llvm_v4i32_ty
+                          ],
+                          [ IntrHasSideEffects]>;
+
 //ONNX                          
 
 def int_isolde_onnx_conv2df32  : Intrinsic<
@@ -73,4 +84,3 @@ class ISOLDELoadQ
 //QWORD
 def int_isolde_vse : ISOLDEStoreQ;
 def int_isolde_vle : ISOLDELoadQ;
-

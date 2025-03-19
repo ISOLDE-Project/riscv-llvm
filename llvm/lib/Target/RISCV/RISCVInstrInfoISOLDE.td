@@ -74,6 +74,24 @@ def REDMULE_GEMM: ISOLDEInst128<
              ]>{                 
 }
 
+def REDMULE_GEMM2 : ISOLDEInst32Ext<
+    0b000,
+    (outs),  
+    (ins  GPR:$rd, GPR:$rs1, GPR:$rs2, QPR:$rs3),  
+    "redmule.gemm2", "", "$rd, $rs1, $rs2, $rs3",
+    [
+      (set 
+          (int_isolde_redmule_gemm2 (iPTR GPR:$rd),
+              (iPTR GPR:$rs1),
+              (iPTR GPR:$rs2),
+              (v4i32 QPR:$rs3)
+          )
+     )]
+> {
+    let hasSideEffects = 1;
+    let mayLoad = 1;
+    let mayStore = 1;
+}
 
 //push, pop Q registers
 def PUSHQWORD
