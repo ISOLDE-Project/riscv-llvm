@@ -8,4 +8,5 @@ define void @test_redmule_gemm2(ptr %rd, ptr %rs1, ptr %rs2, <4 x i32> %rs3) {
   ret void
 }
 
-; CHECK: redmule.gemm2 a0, a1, a2, Q10
+;CHECK: redmule.gemm2. a0, a1, a2, Q10
+;CHECK-NEXT:        ret
